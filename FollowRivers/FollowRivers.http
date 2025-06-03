@@ -1,0 +1,6 @@
+@FollowRivers_HostAddress = http://localhost:5038
+
+GET {{FollowRivers_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
