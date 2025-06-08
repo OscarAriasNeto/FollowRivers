@@ -2,8 +2,8 @@
 using FollowRivers.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Oracle.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -19,25 +19,29 @@ namespace FollowRivers.Migrations
                 .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            OracleModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("FollowRivers.Models.Person", b =>
                 {
-                    b.Property<int>("PersonId")
+                    b.Property<long>("PersonId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("NUMBER(19)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PersonId"));
+                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("PersonId"));
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("NVARCHAR2(100)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("NVARCHAR2(100)");
+
+                    b.Property<string>("Senha")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("PersonId");
 
@@ -46,22 +50,23 @@ namespace FollowRivers.Migrations
 
             modelBuilder.Entity("FollowRivers.Models.RiverAddress", b =>
                 {
-                    b.Property<int>("RiverAddressId")
+                    b.Property<long>("RiverAddressId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("NUMBER(19)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RiverAddressId"));
+                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("RiverAddressId"));
 
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("NVARCHAR2(200)");
 
-                    b.Property<bool>("CanCauseFlood")
-                        .HasColumnType("bit");
+                    b.Property<string>("CanCauseFlood")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<int>("PersonId")
-                        .HasColumnType("int");
+                    b.Property<long>("PersonId")
+                        .HasColumnType("NUMBER(19)");
 
                     b.HasKey("RiverAddressId");
 

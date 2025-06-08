@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FollowRivers")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+40233b540579efd0dd4f0c0ea42cd9f56eaa3c62")]
 [assembly: System.Reflection.AssemblyProductAttribute("FollowRivers")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FollowRivers")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

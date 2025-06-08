@@ -11,15 +11,5 @@ namespace FollowRivers.Data
 
         public DbSet<Person> Persons { get; set; }
         public DbSet<RiverAddress> RiverAddresses { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // Configure 1:N relationship between Person and RiverAddress
-            modelBuilder.Entity<Person>()
-                .HasMany(p => p.RiverAddresses)
-                .WithOne(r => r.Person)
-                .HasForeignKey(r => r.PersonId)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using FollowRivers.Data;
 using FollowRivers.Models;
 using FollowRivers.Models;
+using FollowRivers.DTO;
 
 namespace FollowRivers.Controllers
 {
@@ -17,7 +18,6 @@ namespace FollowRivers.Controllers
             _context = context;
         }
 
-        // GET: api/riveraddress
         [HttpGet]
         public async Task<IActionResult> GetRiverAddresses()
         {
@@ -25,29 +25,32 @@ namespace FollowRivers.Controllers
             return Ok(riverAddresses);
         }
 
-        // POST: api/riveraddress
         [HttpPost]
-        public async Task<IActionResult> CreateRiverAddress([FromBody] RiverAddress riverAddress)
+        public async Task<IActionResult> CreateRiverAddress([FromBody] RiverAddressDTO riverAddressDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            Person person = await _context.Persons.FindAsync(riverAddressDTO.PersonId);
+            if (person == null) return BadRequest(ModelState);
+            var riverAddress = new RiverAddress { Address = riverAddressDTO.Address, CanCauseFlood = riverAddressDTO.CanCauseFlood, Person = person };
             _context.RiverAddresses.Add(riverAddress);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetRiverAddresses), new { id = riverAddress.RiverAddressId }, riverAddress);
         }
 
-        // PUT: api/riveraddress/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRiverAddress(int id, [FromBody] RiverAddress riverAddress)
+        public async Task<IActionResult> UpdateRiverAddress(int id, [FromBody] RiverAddressDTO riverAddressDTO)
         {
-            if (id != riverAddress.RiverAddressId)
-                return BadRequest();
+            var person = await _context.Persons.FindAsync(riverAddressDTO.PersonId);
+            if (person == null) return BadRequest();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            var riverAddress = await _context.RiverAddresses.FindAsync(id);
+            riverAddress.Address = riverAddressDTO.Address;
+            riverAddress.Person = person;
+            riverAddress.CanCauseFlood = riverAddressDTO.CanCauseFlood;
             _context.Entry(riverAddress).State = EntityState.Modified;
 
             try
@@ -65,7 +68,6 @@ namespace FollowRivers.Controllers
             return NoContent();
         }
 
-        // DELETE: api/riveraddress/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRiverAddress(int id)
         {

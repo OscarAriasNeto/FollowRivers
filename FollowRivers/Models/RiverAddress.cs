@@ -1,23 +1,23 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace FollowRivers.Models
 {
     public class RiverAddress
     {
         [Key]
-        public int RiverAddressId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long RiverAddressId { get; set; }
 
         [Required]
         [MaxLength(200)]
         public string Address { get; set; }
 
-        public bool CanCauseFlood { get; set; }
-
-        // Foreign key to Person
-        public int PersonId { get; set; }
+        public string CanCauseFlood { get; set; }
 
         [ForeignKey("PersonId")]
+        [JsonIgnore]
         public Person Person { get; set; }
     }
 }
