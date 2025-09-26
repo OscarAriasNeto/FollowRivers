@@ -1,151 +1,168 @@
-.# Youtube
-https://youtu.be/q2SAQCvYXUY
+# 🌊 Follow Rivers API
 
-# 🌊 Follow Rivers
+API RESTful construída com ASP.NET Core 8 para monitoramento de pontos de rios, cadastro de pessoas responsáveis e emissão de alertas de inundação.
 
-Projeto backend desenvolvido em .NET com ASP.NET Core e Entity Framework. O objetivo é permitir o cadastro de pessoas e o registro de endereços de rios relacionados a elas, com a possibilidade de marcar se uma localização pode causar alagamentos.
+## 👥 Integrantes
 
----
+- Vanessa Dias (RM556936)
 
-## 📌 Sumário
+## 🧭 Justificativa do Domínio e da Arquitetura
 
-- [Tecnologias Utilizadas](#-tecnologias-utilizadas)
-- [Diagrama de Entidades](#-diagrama-de-entidades)
-- [Como Rodar o Projeto](#-como-rodar-o-projeto)
-- [Endpoints da API](#-endpoints-da-api)
-- [Desenvolvimento](#-desenvolvimento)
-- [Testes](#-testes)
-- [Possíveis Melhorias Futuras](#-possíveis-melhorias-futuras)
+O domínio foi escolhido para apoiar equipes responsáveis pelo monitoramento de rios suscetíveis a enchentes:
 
----
+- **Pessoas** representam os agentes responsáveis pelo monitoramento em campo e pelo registro de alertas.
+- **Pontos de rio** (RiverAddresses) concentram informações dos locais monitorados com risco de inundação.
+- **Alertas de inundação** (FloodAlerts) documentam ocorrências e níveis de severidade para atuação preventiva.
 
-## 🛠️ Tecnologias Utilizadas
+A API segue uma arquitetura em camadas simples, utilizando Entity Framework Core para persistência e controllers RESTful para exposição dos recursos. As respostas utilizam DTOs, paginação, HATEOAS e validação de dados, garantindo boas práticas de APIs REST.
 
-- ASP.NET Core
+## 🧰 Tecnologias
+
+- .NET 8 / ASP.NET Core Web API
 - Entity Framework Core
-- C#
-- SQL Server
-- RESTful API
+- Oracle Database (via Oracle EF Core Provider)
+- Swagger / OpenAPI (com anotações e exemplos de payload)
 
----
-
-## 📊 Diagrama de Entidades
-
-```mermaid
-erDiagram
-    PERSON ||--o{ RIVER_ADDRESS : has
-    PERSON {
-        int PersonId
-        string Name
-        string Email
-        string Senha
-    }
-    RIVER_ADDRESS {
-        int RiverAddressId
-        string Address
-        bool CanCauseFlood
-        int PersonId
-    }
-```
-
----
-
-## 💻 Como Rodar o Projeto
+## 🚀 Como Executar
 
 ```bash
-# 1. Clone o repositório
+# 1. Clonar o repositório
 git clone https://github.com/seu-usuario/follow-rivers.git
 cd follow-rivers
 
-# 2. Restaure os pacotes
+# 2. Restaurar dependências
 dotnet restore
 
-# 3. (Opcional) Aplique as migrations (caso esteja usando migrations do EF Core)
+# 3. Aplicar migrations (opcional, caso utilize banco Oracle configurado)
 dotnet ef database update
 
-# 4. Execute o projeto
-dotnet run
+# 4. Executar a API
+dotnet run --project FollowRivers/FollowRivers.csproj
 ```
 
-A API ficará disponível em: `https://localhost:5001/api`
+A API ficará disponível em `https://localhost:5001` (HTTPS) e `http://localhost:5000` (HTTP). A documentação interativa do Swagger pode ser acessada em `/swagger` durante o modo de desenvolvimento.
 
----
+## ✅ Testes
 
-## 📡 Endpoints da API
+```bash
+dotnet test
+```
 
-### 👤 PersonController `/api/person`
+> No momento não há projetos de teste automatizado, mas o comando acima garante a execução automática quando forem adicionados.
 
-| Método | Rota                  | Ação                                    |
-|--------|-----------------------|-----------------------------------------|
-| GET    | `/api/person`         | Lista todas as pessoas cadastradas      |
-| POST   | `/api/person`         | Cria uma nova pessoa                    |
-| POST   | `/api/person/login`   | Realiza login com email e senha         |
-| PUT    | `/api/person/{id}`    | Atualiza os dados de uma pessoa         |
-| DELETE | `/api/person/{id}`    | Remove uma pessoa do sistema            |
+## 📘 Documentação OpenAPI
 
-**Exemplo de payload:**
+A API expõe documentação no Swagger com:
 
+- Descrição e sumário dos endpoints.
+- Anotações de parâmetros e códigos de status.
+- Exemplos de payloads para criação/atualização de recursos.
+- Modelos de dados com metadados e exemplos.
+
+## 📡 Endpoints
+
+Os endpoints seguem o padrão REST e retornam recursos com links HATEOAS. Todos os `GET` suportam paginação via `pageNumber` (padrão 1) e `pageSize` (padrão 10, máximo 50).
+
+### 👤 Pessoas `/api/person`
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/api/person` | Lista paginada de pessoas cadastradas. |
+| GET | `/api/person/{id}` | Obtém uma pessoa específica. |
+| POST | `/api/person` | Cria uma nova pessoa (links de consulta, atualização e remoção). |
+| PUT | `/api/person/{id}` | Atualiza os dados de uma pessoa. |
+| DELETE | `/api/person/{id}` | Remove uma pessoa do sistema. |
+
+**Payload de criação/atualização**
 ```json
 {
-  "name": "João da Silva",
-  "email": "joao@email.com",
-  "senha": "123456"
+  "name": "Mariana Costa",
+  "email": "mariana.costa@email.com",
+  "senha": "Senha@2024"
 }
 ```
 
----
+### 🌍 Pontos de Rio `/api/riveraddress`
 
-### 🌍 RiverAddressController `/api/riveraddress`
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/api/riveraddress` | Lista paginada de pontos monitorados. |
+| GET | `/api/riveraddress/{id}` | Retorna um ponto monitorado específico. |
+| POST | `/api/riveraddress` | Registra um novo ponto de monitoramento ligado a uma pessoa. |
+| PUT | `/api/riveraddress/{id}` | Atualiza as informações de um ponto monitorado. |
+| DELETE | `/api/riveraddress/{id}` | Remove um ponto monitorado. |
 
-| Método | Rota                         | Ação                                              |
-|--------|------------------------------|---------------------------------------------------|
-| GET    | `/api/riveraddress`          | Lista todos os endereços de rios cadastrados      |
-| POST   | `/api/riveraddress`          | Cria um novo endereço de rio para uma pessoa      |
-| PUT    | `/api/riveraddress/{id}`     | Atualiza um endereço de rio                       |
-| DELETE | `/api/riveraddress/{id}`     | Remove um endereço de rio                         |
-
-**Exemplo de payload:**
-
+**Payload de criação/atualização**
 ```json
 {
-  "address": "Rua do Rio 123",
+  "address": "Margem esquerda do Rio Tietê, km 23",
   "canCauseFlood": true,
   "personId": 1
 }
 ```
 
----
+### 🚨 Alertas de Inundação `/api/floodalert`
 
-## ⚙️ Desenvolvimento
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/api/floodalert` | Lista paginada de alertas registrados. |
+| GET | `/api/floodalert/{id}` | Recupera um alerta específico. |
+| POST | `/api/floodalert` | Cria um novo alerta ligado a um ponto monitorado e uma pessoa. |
+| PUT | `/api/floodalert/{id}` | Atualiza as informações de um alerta. |
+| DELETE | `/api/floodalert/{id}` | Remove um alerta. |
 
-O projeto possui os seguintes componentes:
+**Payload de criação/atualização**
+```json
+{
+  "title": "Risco crítico de inundação",
+  "description": "Volume de chuvas acumulado em 48h ultrapassou o limite seguro. Evacuação recomendada.",
+  "severity": "Crítico",
+  "personId": 1,
+  "riverAddressId": 1
+}
+```
 
-- **Controllers**: `PersonController` e `RiverAddressController` lidam com as requisições REST.
-- **DTOs**: Utilizados para entrada de dados (`PersonDTO`, `RiverAddressDTO`).
-- **Models**: Representam as entidades persistidas no banco de dados.
-- **DbContext (`FollowRiversContext`)**: Responsável pelas operações de persistência e leitura no banco.
+## 🔗 HATEOAS e Paginação
 
----
+As respostas retornam objetos com:
 
-## 🧪 Testes
+- `data`: dados do recurso solicitado.
+- `links`: ações relacionadas (`self`, `update`, `delete`, `next`, `previous`).
+- `pageNumber`, `pageSize`, `totalItems` e `totalPages` em respostas paginadas.
 
-Atualmente os testes manuais são realizados utilizando ferramentas como [Postman](https://www.postman.com/) ou [Insomnia](https://insomnia.rest/) para validar os seguintes fluxos:
+Exemplo de resposta `GET /api/person`:
 
-1. **Criação de usuário** com validação de e-mail duplicado e campos obrigatórios.
-2. **Login** com verificação de credenciais válidas e inválidas.
-3. **Criação de endereço de rio** vinculado a uma pessoa válida.
-4. **Listagem e remoção** de pessoas e endereços.
+```json
+{
+  "items": [
+    {
+      "data": {
+        "personId": 1,
+        "name": "Mariana Costa",
+        "email": "mariana.costa@email.com"
+      },
+      "links": [
+        { "href": "https://localhost:5001/api/person/1", "rel": "self", "method": "GET" },
+        { "href": "https://localhost:5001/api/person/1", "rel": "update", "method": "PUT" },
+        { "href": "https://localhost:5001/api/person/1", "rel": "delete", "method": "DELETE" }
+      ]
+    }
+  ],
+  "pageNumber": 1,
+  "pageSize": 10,
+  "totalItems": 1,
+  "totalPages": 1,
+  "hasPrevious": false,
+  "hasNext": false,
+  "links": [
+    { "href": "https://localhost:5001/api/person?pageNumber=1&pageSize=10", "rel": "self", "method": "GET" }
+  ]
+}
+```
 
-> 💡 Sugestão futura: implementar testes automatizados com xUnit ou MSTest e cobertura de código com Coverlet.
+## 📦 Possíveis Melhorias Futuras
 
----
-
-## ✅ Possíveis Melhorias Futuras
-
-- Autenticação com JWT e roles de usuário.
-- Logs com Serilog ou NLog.
-- Testes automatizados.
-- Paginação nos endpoints GET.
-- Documentação com Swagger.
-
----
+- Publicação via container Docker.
+- Testes automatizados de integração.
+- Autenticação e autorização com JWT.
+- Observabilidade com logs estruturados e métricas.

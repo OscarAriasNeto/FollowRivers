@@ -1,25 +1,31 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using FollowRivers.Models;
 
-namespace FollowRivers.Models
+namespace FollowRivers.Models;
+
+/// <summary>
+/// Representa uma pessoa responsável por acompanhar pontos monitorados de rios.
+/// </summary>
+public class Person
 {
-    public class Person
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long PersonId { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public long PersonId { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string Name { get; set; }
+    [Required]
+    [MaxLength(100)]
+    public string Name { get; set; } = string.Empty;
 
-        [MaxLength(100)]
-        public string Email { get; set; }
+    [Required]
+    [EmailAddress]
+    [MaxLength(100)]
+    public string Email { get; set; } = string.Empty;
 
-        public string Senha {  get; set; }
+    [Required]
+    [MinLength(6)]
+    public string Senha { get; set; } = string.Empty;
 
-        public List<RiverAddress> RiverAddresses { get; set; }
-    }
+    public ICollection<RiverAddress> RiverAddresses { get; set; } = new List<RiverAddress>();
+    public ICollection<FloodAlert> FloodAlerts { get; set; } = new List<FloodAlert>();
 }
